@@ -1,0 +1,8 @@
+## Interface: 16001
+## Title: Mat Tooltip
+## Notes: Shows AH (from your own scans) and vendor prices plus a SELL/VENDOR/HOLD verdict on Skinning and Herbalism mats. Untested in-game; use at your own risk.
+## Author: Kenny
+## Version: 0.1.0
+## SavedVariables: MatTooltipDB
+
+MatTooltip.lua
