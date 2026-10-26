@@ -5,7 +5,7 @@
 > - API usage is verified against Blizzard's UI source only (Gethe/wow-ui-source `forever` branch, 1.60.1 build 70374), plus luacheck and mock-client tests.
 > - Item IDs were checked against auctionhouse.fyi's Forever item data (build 1.60.1.70009), not in-game.
 > - `## Interface: 16001` is unconfirmed (the UI source .toc files show `0`).
-> - Found a bug? Use the addon's `report` command and [open an issue](https://github.com/masterred92/wow-forever-addons/issues).
+> - Found a bug? Use the addon's `report` command and [open an issue](https://github.com/masterred92/MatTooltip/issues).
 
 Adds lines to item tooltips for **Leather (Skinning) and Herb** trade goods:
 - **AH (your scan)**: the lowest per-unit buyout from your newest full AH scan (this addon's or PriceLog's).
@@ -18,14 +18,20 @@ Adds lines to item tooltips for **Leather (Skinning) and Herb** trade goods:
 
 It never buys, sells, posts or clicks anything. The scan only runs when you type the command.
 
+## Download
+- **CurseForge:** coming soon (TODO: project not created yet). Meanwhile see [MasterRed92 on CurseForge](https://www.curseforge.com/members/masterred92/projects).
+- **Wago Addons:** coming soon (TODO: project not created yet).
+- **GitHub:** [Releases](https://github.com/masterred92/MatTooltip/releases) (coming with the first tagged release) · [Issues](https://github.com/masterred92/MatTooltip/issues)
+- **Companion addons** (optional, they share AH scans): [NeutralFlip](https://github.com/masterred92/NeutralFlip) · [PriceLog](https://github.com/masterred92/PriceLog) · [GoldPerSpot](https://github.com/masterred92/GoldPerSpot)
+
 ## Commands
 `/mattip scan` (at an open AH, out of combat; about once per 15 minutes) · `never <id|link>` · `unnever <id>` · `list` · `margin 1.1` · `toggle` · `plugins` · `report`
 
 Upgrading from 0.1.0: your settings and prices move to `KennyMatTooltipDB` automatically on first login.
 
 ## Install
-1. Download the addon zip from [Releases](https://github.com/masterred92/wow-forever-addons/releases) (or copy the folder from this repo).
-2. Put the addon folder (e.g. `FarmTracker`) in `World of Warcraft\_forever_\Interface\AddOns\`. That folder sits next to `_retail_`; the exact name may differ.
+1. Download the addon zip (see Download above) or clone this repo into a folder named `MatTooltip`.
+2. Put the addon folder (`MatTooltip`) in `World of Warcraft\_forever_\Interface\AddOns\`. That folder sits next to `_retail_`; the exact name may differ.
 3. Restart the game, or type `/reload`. Check it is ticked in the AddOns list on the character screen.
 
 ## In-game test checklist
@@ -39,3 +45,6 @@ Upgrading from 0.1.0: your settings and prices move to `KennyMatTooltipDB` autom
 8. Hover mats in combat: no errors, no "action blocked" or taint messages.
 9. If 0.1.0 was installed before: the old settings and prices carried over.
 10. `/mattip report`: a copyable window opens with the client build.
+
+## Development
+`tests/run.sh [path-to-wow-ui-source-forever]` runs `luac -p`, luacheck, the mock-client tests and (with a path) the API check against Blizzard's UI source. GitHub Actions runs the same on every push. Releases are packaged by [BigWigsMods/packager](https://github.com/BigWigsMods/packager) only when a `v*` tag is pushed.
