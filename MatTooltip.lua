@@ -6,7 +6,7 @@ local CLASS_TRADEGOODS, SUB_LEATHER, SUB_HERB = 7, 6, 9 -- trade goods; leather 
 local SCHEMA = 1
 local PROVIDER_FORMAT = 1
 
-local DEFAULTS = { enabled = true, ahCut = 0.05, sellMargin = 1.10, staleDays = 3 }
+local DEFAULTS = { enabled = true, ahCut = 0.05, sellMargin = 1.10, staleDays = 3, bagnon = true }
 -- Seeded never-vendor mats (IDs checked against auctionhouse.fyi Forever item data, build 1.60.1.70009).
 -- Users override per item in db.neverVendor ([id] = true / false); new seeds reach old users.
 local SEED_NEVER = { [249427] = true, [249399] = true } -- Pristine Leather, Frilled Lichen
@@ -62,6 +62,15 @@ function M.Verdict(_, vendor, rec, now, cfg, never)
   end
   return "VENDOR", nil
 end
+
+-- Verdict for one item without a tooltip (Bagnon overlay, LDB): nil if it isn't a Skinning/Herbalism mat.
+function M.ItemVerdict(itemID)
+  if not (db and settings and itemID) or not isMat(itemID) then return nil end
+  local info = C.GetItemInfo(itemID)
+  local rec = M.GetPriceRecord(itemID)
+  return M.Verdict(itemID, info and info.sellPrice, rec, C.Now(), settings, M.IsNeverVendor(itemID)), rec, info
+end
+function M.Settings() return settings end
 
 -- Tooltip providers (plugin API): getLine(itemID) -> text or nil.
 local providers = Core.NewRegistry("provider", PROVIDER_FORMAT, { "getLine" })
@@ -173,6 +182,9 @@ SlashCmdList.KENNYMATTOOLTIP = function(msg)
     Core.Print(id .. (want and " added to" or " removed from") .. " never-vendor list.")
   elseif cmd == "margin" and tonumber(arg) then settings.sellMargin = tonumber(arg); Core.Print("margin " .. settings.sellMargin)
   elseif cmd == "toggle" then settings.enabled = not settings.enabled; Core.Print(settings.enabled and "on" or "off")
+  elseif cmd == "bagnon" then
+    settings.bagnon = not settings.bagnon
+    Core.Print("Bagnon bag markers " .. (settings.bagnon and "on." or "off.") .. (M.RefreshBagnon and M.RefreshBagnon() and "" or " (Bagnon isn't loaded)"))
   elseif cmd == "list" then
     for id in pairs(SEED_NEVER) do if M.IsNeverVendor(id) then Core.Print("never vendor: " .. id .. " (seed)") end end
     for id, v in pairs(db.neverVendor) do if v and not SEED_NEVER[id] then Core.Print("never vendor: " .. id) end end
@@ -183,6 +195,6 @@ SlashCmdList.KENNYMATTOOLTIP = function(msg)
     Core.ShowReport({ "schema " .. tostring(db.schema), "prices stored: " .. n, "enabled: " .. tostring(settings.enabled),
       "PriceLog loaded: " .. tostring(KennyPriceLog ~= nil), "providers: " .. #providers.list })
   else
-    Core.Print("/mattip scan | never <id> | unnever <id> | list | margin <x> | toggle | plugins | report")
+    Core.Print("/mattip scan | never <id> | unnever <id> | list | margin <x> | toggle | bagnon | plugins | report")
   end
 end
