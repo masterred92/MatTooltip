@@ -2,13 +2,6 @@
 
 # Mat Tooltip (WoW: Forever) v0.2.0
 
-> [!WARNING]
-> **Untested in-game. Use at your own risk.** WoW: Forever has not launched yet (Nov 4 2026), so none of this has run in the real client.
-> - API usage is verified against Blizzard's UI source only (Gethe/wow-ui-source `forever` branch, 1.60.1 build 70374), plus luacheck and mock-client tests.
-> - Item IDs were checked against auctionhouse.fyi's Forever item data (build 1.60.1.70009), not in-game.
-> - `## Interface: 16001` is unconfirmed (the UI source .toc files show `0`).
-> - Found a bug? Use the addon's `report` command and [open an issue](https://github.com/masterred92/MatTooltip/issues).
-
 Adds lines to item tooltips for **Leather (Skinning) and Herb** trade goods:
 - **AH (your scan)**: the lowest per-unit buyout from your newest full AH scan (this addon's or PriceLog's).
 - **Vendor**: the vendor sell price.

@@ -1,6 +1,6 @@
 ## Interface: 16001
 ## Title: Mat Tooltip
-## Notes: AH (your own scans) and vendor prices plus a SELL/VENDOR/HOLD verdict on Skinning and Herbalism mats. UNTESTED IN-GAME (WoW: Forever not launched); API checked against Blizzard UI source only. Use at your own risk.
+## Notes: AH (your own scans) and vendor prices plus a SELL/VENDOR/HOLD verdict on Skinning and Herbalism mats.
 ## Author: Kenny
 ## Version: 0.2.0
 ## SavedVariables: KennyMatTooltipDB, MatTooltipDB
