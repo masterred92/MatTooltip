@@ -1,3 +1,5 @@
+<p align="center"><img src="media/logo.png" alt="MatTooltip logo" width="200"></p>
+
 # Mat Tooltip (WoW: Forever) v0.2.0
 
 > [!WARNING]
@@ -19,8 +21,8 @@ Adds lines to item tooltips for **Leather (Skinning) and Herb** trade goods:
 It never buys, sells, posts or clicks anything. The scan only runs when you type the command.
 
 ## Download
-- **CurseForge:** coming soon (TODO: project not created yet). Meanwhile see [MasterRed92 on CurseForge](https://www.curseforge.com/members/masterred92/projects).
-- **Wago Addons:** coming soon (TODO: project not created yet).
+- **CurseForge:** https://www.curseforge.com/wow/addons/mattooltip (first release coming at launch, Nov 4). Author: [MasterRed92](https://www.curseforge.com/members/masterred92/projects).
+- **Wago Addons:** https://addons.wago.io/addons/mattooltip (first release coming at launch, Nov 4).
 - **GitHub:** [Releases](https://github.com/masterred92/MatTooltip/releases) (coming with the first tagged release) · [Issues](https://github.com/masterred92/MatTooltip/issues)
 - **Companion addons** (optional, they share AH scans): [NeutralFlip](https://github.com/masterred92/NeutralFlip) · [PriceLog](https://github.com/masterred92/PriceLog) · [GoldPerSpot](https://github.com/masterred92/GoldPerSpot)
 
@@ -45,6 +47,7 @@ Upgrading from 0.1.0: your settings and prices move to `KennyMatTooltipDB` autom
 8. Hover mats in combat: no errors, no "action blocked" or taint messages.
 9. If 0.1.0 was installed before: the old settings and prices carried over.
 10. `/mattip report`: a copyable window opens with the client build.
+11. In the AddOns list (character select or Esc > AddOns), MatTooltip shows its icon. If it shows a blank or green square, report it; the addon still works.
 
 ## Development
 `tests/run.sh [path-to-wow-ui-source-forever]` runs `luac -p`, luacheck, the mock-client tests and (with a path) the API check against Blizzard's UI source. GitHub Actions runs the same on every push. Releases are packaged by [BigWigsMods/packager](https://github.com/BigWigsMods/packager) only when a `v*` tag is pushed.

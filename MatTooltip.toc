@@ -6,6 +6,9 @@
 ## SavedVariables: KennyMatTooltipDB, MatTooltipDB
 ## OptionalDeps: PriceLog
 ## X-License: MIT
+## IconTexture: Interface\AddOns\MatTooltip\media\icon
+## X-Curse-Project-ID: 1767895
+## X-Wago-ID: RNL40DNo
 
 Compat.lua
 Core.lua

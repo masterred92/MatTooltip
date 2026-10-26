@@ -1,6 +1,7 @@
 # Changelog
 
 ## 0.2.0 (first public upload, untested in-game)
+- Added the CurseForge and Wago project IDs to the TOC for automatic packaging, and an icon for the AddOns list (`media/icon.tga`).
 - Uses PriceLog prices when they're newer, adds a tooltip-provider plugin API and `/mattip report`. Settings migrate from 0.1.0 automatically.
 
 ## 0.1.0 (2026-10-14, GitHub only)

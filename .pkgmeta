@@ -1,10 +1,11 @@
-# BigWigsMods/packager config. Project IDs go in MatTooltip.toc as ## X-Curse-Project-ID / ## X-Wago-ID once they exist.
+# BigWigsMods/packager config. Project IDs are in MatTooltip.toc (## X-Curse-Project-ID / ## X-Wago-ID).
 package-as: MatTooltip
 
 ignore:
   - tests
   - tools
   - .luacheckrc
+  - media/logo.png
 
 manual-changelog:
   filename: CHANGELOG.md
