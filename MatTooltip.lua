@@ -1,8 +1,9 @@
--- Mat Tooltip: price + verdict for Skinning/Herbalism mats. Read-only: no automation, no network.
+-- Mat Tooltip: price + verdict for crafting mats (every Trade Goods item). Read-only: no automation, no network.
 local ADDON, ns = ...
 local C, Core = ns.Compat, ns.Core
+local L = Core.L
 
-local CLASS_TRADEGOODS, SUB_LEATHER, SUB_HERB = 7, 6, 9 -- trade goods; leather / herb subclasses
+local CLASS_TRADEGOODS = 7 -- Trade Goods: leather, herbs, cloth, metal and stone, elemental, enchanting...
 local SCHEMA = 1
 local PROVIDER_FORMAT = 1
 
@@ -36,18 +37,26 @@ function M.IsNeverVendor(itemID)
 end
 
 local function isMat(itemID)
-  local classID, subClassID = C.GetItemClass(itemID)
-  return classID == CLASS_TRADEGOODS and (subClassID == SUB_LEATHER or subClassID == SUB_HERB)
+  local classID = C.GetItemClass(itemID)
+  return classID == CLASS_TRADEGOODS
 end
 M.IsMat = isMat
 
--- Newest price from this addon's scans or from PriceLog (if installed): one scan feeds both.
+-- Newest price: the shared store (PriceLog, if installed) or this addon's own scans; then Auctionator's data.
 function M.GetPriceRecord(itemID)
   local own = db and db.prices[itemID]
-  local pl = KennyPriceLog and KennyPriceLog.GetLatest and KennyPriceLog.GetLatest(itemID)
-  if pl and (not own or (pl.t or 0) > (own.t or 0)) then return pl end
-  return own
+  local shared = ns.Hub.GetPrice(itemID, ADDON)
+  if shared and (not own or (shared.t or 0) > (own.t or 0)) then return shared end
+  if own then return own end
+  local api = type(Auctionator) == "table" and Auctionator.API and Auctionator.API.v1
+  if api and api.GetAuctionPriceByItemID then
+    local ok, price = pcall(api.GetAuctionPriceByItemID, "MatTooltip", itemID)
+    price = ok and C.SafeNumber(price)
+    if price and price > 0 then return { p = price, t = 0, src = "Auctionator" } end
+  end
 end
+-- Our own store is only needed when PriceLog isn't there to keep the prices.
+local function priceLogKeepsPrices() return ns.Hub.prices.PriceLog ~= nil end
 
 -- Pure decision logic.
 function M.Verdict(_, vendor, rec, now, cfg, never)
@@ -63,7 +72,7 @@ function M.Verdict(_, vendor, rec, now, cfg, never)
   return "VENDOR", nil
 end
 
--- Verdict for one item without a tooltip (Bagnon overlay, LDB): nil if it isn't a Skinning/Herbalism mat.
+-- Verdict for one item without a tooltip (Bagnon overlay, LDB): nil if it isn't a trade good.
 function M.ItemVerdict(itemID)
   if not (db and settings and itemID) or not isMat(itemID) then return nil end
   local info = C.GetItemInfo(itemID)
@@ -71,6 +80,9 @@ function M.ItemVerdict(itemID)
   return M.Verdict(itemID, info and info.sellPrice, rec, C.Now(), settings, M.IsNeverVendor(itemID)), rec, info
 end
 function M.Settings() return settings end
+-- For our other addons: our own scan prices (used only when PriceLog isn't installed) and the verdict per mat.
+ns.Hub.RegisterPrices(ADDON, function(itemID) return db and db.prices[itemID] end)
+ns.Hub.Provide("verdict", ADDON, function(itemID) return (M.ItemVerdict(itemID)) end)
 
 -- Tooltip providers (plugin API): getLine(itemID) -> text or nil.
 local providers = Core.NewRegistry("provider", PROVIDER_FORMAT, { "getLine" })
@@ -86,10 +98,15 @@ local function addLines(tooltip, itemID)
     local rec = M.GetPriceRecord(itemID)
     local never = M.IsNeverVendor(itemID)
     local v, why = M.Verdict(itemID, vendor, rec, C.Now(), settings, never)
-    tooltip:AddDoubleLine("AH (your scan)", C.Money(rec and rec.p), 0.8, 0.8, 0.8, 1, 1, 1)
+    -- Skip the AH price if another of our addons (NeutralFlip) already showed it in this tooltip.
+    if not tooltip.Claim or tooltip.Claim("price.auction") then
+      tooltip:AddDoubleLine(rec and rec.src == "Auctionator" and "AH (Auctionator)" or "AH (your scan)", C.Money(rec and rec.p), 0.8, 0.8, 0.8, 1, 1, 1)
+    end
     tooltip:AddDoubleLine("Vendor", C.Money(vendor), 0.8, 0.8, 0.8, 1, 1, 1)
     if never then tooltip:AddLine("|cffff4040NEVER VENDOR|r (scarce)") end
     tooltip:AddLine(COLORS[v] .. v .. "|r" .. (why and (" |cff999999(" .. why .. ")|r") or ""))
+    local trend = ns.Hub.Ask("trend", itemID) -- from PriceLog, when it has a week of prices
+    if trend then tooltip:AddLine(("|cff999999%s: %s (%+.0f%%)|r"):format(L["7-day trend"], trend.label, trend.change * 100)) end
   end
   for _, p in ipairs(providers.list) do
     local text = providers.Call(p, "getLine", itemID)
@@ -99,7 +116,6 @@ end
 
 local function OnItemTooltip(tooltip, data)
   if not db or not settings.enabled or not data then return end
-  if tooltip ~= GameTooltip and tooltip ~= ItemRefTooltip then return end
   local itemID = C.SafeNumber(data.id)
   if not itemID then return end
   Core.SafeCall("tooltip", addLines, tooltip, itemID)
@@ -125,6 +141,12 @@ local function ProcessScan()
     end
     if i < n then C_Timer.After(0, step) return end
     local k = 0
+    if priceLogKeepsPrices() then
+      for _ in pairs(best) do k = k + 1 end
+      scanning = false
+      Core.Print(("%d %s"):format(k, L["mats priced; PriceLog keeps the prices, so MatTooltip stores none of its own."]))
+      return
+    end
     for id, r in pairs(best) do db.prices[id] = r; k = k + 1 end
     scanning = false
     Core.Print("saved prices for " .. k .. " mats.")
@@ -147,10 +169,11 @@ f:SetScript("OnEvent", function(_, event, arg1)
     KennyMatTooltipDB = db
     if ok then MatTooltipDB = nil end
     settings = Core.Settings(db.settings, DEFAULTS)
-    TooltipDataProcessor.AddTooltipPostCall(Enum.TooltipDataType.Item, OnItemTooltip)
+    ns.Hub.AddTooltip(ADDON, 30, function(tt, _, data) OnItemTooltip(tt, data) end) -- after prices, in our shared block
   elseif event == "AUCTION_HOUSE_SHOW" then ahOpen = true
   elseif event == "AUCTION_HOUSE_CLOSED" then ahOpen = false
-  elseif event == "REPLICATE_ITEM_LIST_UPDATE" and scanning then
+  elseif event == "REPLICATE_ITEM_LIST_UPDATE" and (scanning or (ns.Hub.ScanActive() and not priceLogKeepsPrices())) then
+    scanning = true -- a scan another of our addons started feeds us too
     -- Fires repeatedly while item info streams in: process once, 2s after the last update.
     scanToken = scanToken + 1
     local token = scanToken
@@ -162,6 +185,20 @@ local function parseID(arg)
   return tonumber(arg) or tonumber((arg or ""):match("item:(%d+)"))
 end
 
+Core.Setup({ cmd = "/mattip",
+  required = { "C_AuctionHouse.ReplicateItems", "C_AuctionHouse.GetNumReplicateItems", "C_AuctionHouse.GetReplicateItemInfo",
+    "C_AuctionHouse.IsThrottledMessageSystemReady", "C_Item.GetItemInfo", "C_Item.GetItemInfoInstant", "TooltipDataProcessor.AddTooltipPostCall" },
+  optional = { "KennyPriceLog", "Auctionator.API.v1.GetAuctionPriceByItemID", "LibStub", "Bagnon" },
+  db = function() return db end,
+  firstRun = { L["Welcome! MatTooltip adds an AH price and a SELL ON AH / VENDOR / HOLD verdict to every crafting mat."],
+    L["At the AH: /mattip scan (once per 15 min). With PriceLog installed, its prices are used and shared."],
+    L["/mattip never <item> keeps a scarce mat off the vendor list; /mattip debug checks your setup."] },
+  debugLines = function()
+    local n = 0
+    for _ in pairs(db and db.prices or {}) do n = n + 1 end
+    return { ("%s: %d (%s)"):format(L["own prices stored"], n, priceLogKeepsPrices() and L["PriceLog keeps prices"] or L["no PriceLog"]) }
+  end })
+
 SLASH_KENNYMATTOOLTIP1 = "/mattip"
 SLASH_KENNYMATTOOLTIP2 = "/kmt"
 SlashCmdList.KENNYMATTOOLTIP = function(msg)
@@ -171,6 +208,8 @@ SlashCmdList.KENNYMATTOOLTIP = function(msg)
     if not ahOpen then Core.Print("open the auction house first.") return end
     if C.InCombat() then Core.Print("not in combat.") return end
     if not C.AHReady() then Core.Print("AH busy, try again shortly.") return end
+    local mine, by, left = ns.Hub.ClaimScan(ADDON)
+    if not mine then Core.Print(("%s %s; %s %d min. %s"):format(L["a full scan was already started by"], by or "?", L["next one in"], math.ceil(left / 60), L["Its results are recorded here too."])) return end
     scanning = true
     C.AHReplicate()
     Core.Print("full scan requested (Blizzard allows about one every 15 minutes).")
@@ -188,6 +227,7 @@ SlashCmdList.KENNYMATTOOLTIP = function(msg)
   elseif cmd == "list" then
     for id in pairs(SEED_NEVER) do if M.IsNeverVendor(id) then Core.Print("never vendor: " .. id .. " (seed)") end end
     for id, v in pairs(db.neverVendor) do if v and not SEED_NEVER[id] then Core.Print("never vendor: " .. id) end end
+  elseif cmd == "debug" then Core.PrintDebug()
   elseif cmd == "plugins" then for _, l in ipairs(providers.Describe()) do Core.Print(l) end
   elseif cmd == "report" then
     local n = 0
@@ -195,6 +235,6 @@ SlashCmdList.KENNYMATTOOLTIP = function(msg)
     Core.ShowReport({ "schema " .. tostring(db.schema), "prices stored: " .. n, "enabled: " .. tostring(settings.enabled),
       "PriceLog loaded: " .. tostring(KennyPriceLog ~= nil), "providers: " .. #providers.list })
   else
-    Core.Print("/mattip scan | never <id> | unnever <id> | list | margin <x> | toggle | bagnon | plugins | report")
+    Core.Print("/mattip scan | never <id> | unnever <id> | list | margin <x> | toggle | bagnon | plugins | debug | report")
   end
 end

@@ -4,7 +4,7 @@ M.now, M.clock, M.combat, M.money = 1790000000, 1000, false, 0
 M.items = { -- itemID -> { name, classID, subClassID, sellPrice } (IDs checked on auctionhouse.fyi Forever data)
   [2318] = { "Light Leather", 7, 6, 15 }, [2447] = { "Peacebloom", 7, 9, 10 },
   [249427] = { "Pristine Leather", 7, 6, 500 }, [249399] = { "Frilled Lichen", 7, 9, 300 },
-  [2589] = { "Linen Cloth", 7, 5, 13 } }
+  [2589] = { "Linen Cloth", 7, 5, 13 }, [25] = { "Worn Shortsword", 2, 7, 1 } }
 M.bags = { [0] = {} }       -- bag -> { slot -> {itemID, count} }
 M.replicate, M.browse, M.commodity = {}, {}, {}
 M.secret = {}               -- values listed here are "secret"
@@ -85,6 +85,7 @@ end
 function M.loadAddon(dir, name)
   local ns = {}
   for line in io.lines(dir .. "/" .. name .. ".toc") do
+    line = line:gsub("\\", "/")
     if line:match("%.lua$") then assert(loadfile(dir .. "/" .. line))(name, ns) end
   end
   M.fire("ADDON_LOADED", name)

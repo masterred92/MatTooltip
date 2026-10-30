@@ -1,17 +1,20 @@
 ## Interface: 16001
 ## Title: Mat Tooltip
-## Notes: AH (your own scans) and vendor prices plus a SELL/VENDOR/HOLD verdict on Skinning and Herbalism mats.
+## Notes: AH and vendor prices plus a SELL ON AH / VENDOR / HOLD verdict on every crafting mat (Trade Goods).
 ## Author: Kenny
-## Version: 0.3.0
+## Version: 0.4.0
 ## SavedVariables: KennyMatTooltipDB, MatTooltipDB
 ## OptionalDeps: PriceLog, LibDataBroker-1.1, BagBrother, Bagnon
 ## X-License: MIT
+## X-Website: https://github.com/masterred92/MatTooltip
 ## IconTexture: Interface\AddOns\MatTooltip\media\icon
 ## X-Curse-Project-ID: 1767895
 ## X-Wago-ID: RNL40DNo
 
-Compat.lua
-Core.lua
+Libs\KennyShared\Compat.lua
+Libs\KennyShared\Core.lua
+Libs\KennyShared\Hub.lua
+Locales\enUS.lua
 MatTooltip.lua
 Bagnon.lua
 Broker.lua

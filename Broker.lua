@@ -26,24 +26,36 @@ function M.UpdateBroker()
   obj.text = #list == 0 and "no mats" or ("mats " .. C.Money(sell))
 end
 
+-- The same summary as a panel in DEB's window, when DEB hosts panels.
+ns.Core.RegisterTextPanel("Mats", function()
+  local list, sell = M.BagSummary()
+  local out = {}
+  for i = 1, math.min(20, #list) do
+    local e = list[i]
+    out[#out + 1] = ("%dx %s: %s %s"):format(e.n, C.GetItemName(e.id) or ("item " .. e.id), e.verdict, e.value > 0 and C.Money(e.value) or "")
+  end
+  out[#out + 1] = "Worth selling on the AH: " .. C.Money(sell)
+  return table.concat(out, "\n")
+end)
+
 function M.InstallBroker()
   if obj then return obj end
-  local ldb = type(LibStub) == "table" and LibStub("LibDataBroker-1.1", true)
-  if not ldb then return nil end
-  obj = ldb:NewDataObject("MatTooltip", {
+  -- One shared "Kenny's addons" entry with a menu when several of our addons are installed; our own entry when alone.
+  obj = ns.Hub.Launcher("MatTooltip", {
+    leftHint = "Tooltip lines on/off",
     type = "data source", text = "Mat Tooltip", label = "Mats",
     icon = "Interface\\AddOns\\MatTooltip\\media\\icon",
     OnClick = function() SlashCmdList.KENNYMATTOOLTIP("toggle") end,
     OnTooltipShow = function(tt)
       local list, sell = M.BagSummary()
       tt:AddLine("Mat Tooltip: mats in your bags")
-      if #list == 0 then tt:AddLine("No Skinning or Herbalism mats in your bags.", 1, 1, 1) end
+      if #list == 0 then tt:AddLine("No crafting mats in your bags.", 1, 1, 1) end
       for i = 1, math.min(10, #list) do
         local e = list[i]
         tt:AddDoubleLine(("%dx %s"):format(e.n, C.GetItemName(e.id) or ("item " .. e.id)), e.verdict .. (e.value > 0 and ("  " .. C.Money(e.value)) or ""), 1, 1, 1, 0.8, 0.8, 0.8)
       end
       tt:AddDoubleLine("Worth selling on the AH", C.Money(sell), 0.2, 1, 0.2, 1, 1, 1)
-      tt:AddLine("Your own scan prices, after the AH cut. Click: tooltip lines on/off.", 0.6, 0.6, 0.6, true)
+      tt:AddLine("AH prices (PriceLog or your scans), after the AH cut. Click: tooltip lines on/off.", 0.6, 0.6, 0.6, true)
     end,
   })
   M.UpdateBroker()

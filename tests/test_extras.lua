@@ -13,7 +13,7 @@ hooksecurefunc = function(t, k, fn) local orig = t[k]; t[k] = function(...) orig
 local Item = { Update = function(self, info) self.info = info end }
 BagBrother = { Item = Item }
 W.loadAddon(".", "MatTooltip")
-W.fire("PLAYER_LOGIN")
+W.fire("PLAYER_LOGIN"); W.runTimers()
 local M = KennyMatTooltip
 check(#hooks == 1 and hooks[1] == "Update", "hooked BagBrother.Item:Update")
 local function newButton()
@@ -28,8 +28,8 @@ check(b.KennyMatTooltipTag and b.KennyMatTooltipTag.text == "?", "mat with no sc
 KennyMatTooltipDB.prices[2447] = { p = 500, t = W.now }
 b:Update({ itemID = 2447 })
 check(b.KennyMatTooltipTag.text == "SELL", "scanned mat worth selling: SELL tag")
-b:Update({ itemID = 2589 })
-check(not b.KennyMatTooltipTag.shown, "non-mat: tag hidden")
+b:Update({ itemID = 25 })
+check(not b.KennyMatTooltipTag.shown, "non-trade-good: tag hidden")
 local b2 = newButton(); b2:Update({}); check(b2.KennyMatTooltipTag == nil, "empty slot: no tag")
 W.secret[2447] = true; b:Update({ itemID = 2447 }); W.secret[2447] = nil
 check(not b.KennyMatTooltipTag.shown, "secret itemID: no tag")
