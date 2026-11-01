@@ -3,18 +3,15 @@
 -- the file to the TOC. Any string without a translation falls back to the English text.
 local _, ns = ...
 ns.Core.AddLocale("enUS", {
-  ["/mattip never <item> keeps a scarce mat off the vendor list; /mattip debug checks your setup."] = true,
   ["7-day trend"] = true,
-  ["At the AH: /mattip scan (once per 15 min). With PriceLog installed, its prices are used and shared."] = true,
   ["Its results are recorded here too."] = true,
   ["PriceLog keeps prices"] = true,
   ["Some features are switched off. Type"] = true,
   ["WARNING: this client is missing APIs this addon needs:"] = true,
-  ["Welcome! MatTooltip adds an AH price and a SELL ON AH / VENDOR / HOLD verdict to every crafting mat."] = true,
+  ["Welcome! Crafting mats now show an AH price and a SELL ON AH / VENDOR / HOLD verdict. /mattip for commands."] = true,
   ["a full scan was already started by"] = true,
   ["client"] = true,
   ["locale"] = true,
-  ["mats priced; PriceLog keeps the prices, so MatTooltip stores none of its own."] = true,
   ["next one in"] = true,
   ["no PriceLog"] = true,
   ["none (works on its own)"] = true,

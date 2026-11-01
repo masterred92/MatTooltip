@@ -2,7 +2,7 @@
 ## Title: Mat Tooltip
 ## Notes: AH and vendor prices plus a SELL ON AH / VENDOR / HOLD verdict on every crafting mat (Trade Goods).
 ## Author: Kenny
-## Version: 0.4.1
+## Version: 0.4.2
 ## SavedVariables: KennyMatTooltipDB, MatTooltipDB
 ## OptionalDeps: PriceLog, LibDataBroker-1.1, BagBrother, Bagnon
 ## X-License: MIT

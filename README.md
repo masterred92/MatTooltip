@@ -1,6 +1,6 @@
 <p align="center"><img src="media/logo.png" alt="MatTooltip logo" width="200"></p>
 
-# Mat Tooltip (WoW: Forever) v0.4.1
+# Mat Tooltip (WoW: Forever) v0.4.2
 
 [![Tests](https://github.com/masterred92/MatTooltip/actions/workflows/tests.yml/badge.svg)](https://github.com/masterred92/MatTooltip/actions/workflows/tests.yml) [![WoW: Forever](https://img.shields.io/badge/WoW%3A%20Forever-Interface%2016001-c8a165)](https://github.com/masterred92/MatTooltip/blob/main/MatTooltip.toc) [![Release](https://img.shields.io/github/v/release/masterred92/MatTooltip?label=release)](https://github.com/masterred92/MatTooltip/releases) [![License: MIT](https://img.shields.io/github/license/masterred92/MatTooltip)](https://github.com/masterred92/MatTooltip/blob/main/LICENSE) [![CurseForge](https://img.shields.io/badge/CurseForge-MatTooltip-f16436)](https://www.curseforge.com/wow/addons/mattooltip) [![Wago](https://img.shields.io/badge/Wago-MatTooltip-c1272d)](https://addons.wago.io/addons/mattooltip)
 

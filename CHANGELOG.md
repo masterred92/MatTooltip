@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.4.2
+- Prices PriceLog takes from Auctionator are labelled 'AH (Auctionator)' instead of 'AH (your scan)'.
+- Prices of unknown age (e.g. from Auctionator) are no longer marked 'price is old'.
+- Quieter: one-line first-login welcome, and no extra chat line after a scan when PriceLog already reports it.
+
 ## 0.4.1
 - A scan that hits an error no longer leaves MatTooltip re-processing every later AH update.
 - `/mattip margin` checks the value (0.5 to 10) and shows the current one.

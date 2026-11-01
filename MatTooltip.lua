@@ -61,7 +61,7 @@ local function priceLogKeepsPrices() return ns.Hub.prices.PriceLog ~= nil end
 -- Pure decision logic.
 function M.Verdict(_, vendor, rec, now, cfg, never)
   local ah = rec and rec.p
-  local stale = rec and (now - rec.t) > cfg.staleDays * 86400
+  local stale = rec and (rec.t or 0) > 0 and (now - rec.t) > cfg.staleDays * 86400 -- t = 0: age unknown (e.g. Auctionator)
   if not ah then
     return "HOLD", (never or not vendor or vendor == 0) and "no AH scan yet" or "scan the AH first"
   end
@@ -100,7 +100,8 @@ local function addLines(tooltip, itemID)
     local v, why = M.Verdict(itemID, vendor, rec, C.Now(), settings, never)
     -- Skip the AH price if another of our addons (NeutralFlip) already showed it in this tooltip.
     if not tooltip.Claim or tooltip.Claim("price.auction") then
-      tooltip:AddDoubleLine(rec and rec.src == "Auctionator" and "AH (Auctionator)" or "AH (your scan)", C.Money(rec and rec.p), 0.8, 0.8, 0.8, 1, 1, 1)
+      local src = rec and (rec.src or rec.source) -- PriceLog's fallback names its source "source"
+      tooltip:AddDoubleLine(src and ("AH (" .. src .. ")") or "AH (your scan)", C.Money(rec and rec.p), 0.8, 0.8, 0.8, 1, 1, 1)
     end
     tooltip:AddDoubleLine("Vendor", C.Money(vendor), 0.8, 0.8, 0.8, 1, 1, 1)
     if never then tooltip:AddLine("|cffff4040NEVER VENDOR|r (scarce)") end
@@ -143,9 +144,7 @@ local function ProcessScan()
     if i < n then C_Timer.After(0, safeStep) return end
     local k = 0
     if priceLogKeepsPrices() then
-      for _ in pairs(best) do k = k + 1 end
-      scanning = false
-      Core.Print(("%d %s"):format(k, L["mats priced; PriceLog keeps the prices, so MatTooltip stores none of its own."]))
+      scanning = false -- PriceLog reports the scan; no second chat line
       return
     end
     for id, r in pairs(best) do db.prices[id] = r; k = k + 1 end
@@ -193,9 +192,7 @@ Core.Setup({ cmd = "/mattip",
     "C_AuctionHouse.IsThrottledMessageSystemReady", "C_Item.GetItemInfo", "C_Item.GetItemInfoInstant", "TooltipDataProcessor.AddTooltipPostCall" },
   optional = { "KennyPriceLog", "Auctionator.API.v1.GetAuctionPriceByItemID", "LibStub", "Bagnon" },
   db = function() return db end,
-  firstRun = { L["Welcome! MatTooltip adds an AH price and a SELL ON AH / VENDOR / HOLD verdict to every crafting mat."],
-    L["At the AH: /mattip scan (once per 15 min). With PriceLog installed, its prices are used and shared."],
-    L["/mattip never <item> keeps a scarce mat off the vendor list; /mattip debug checks your setup."] },
+  firstRun = { L["Welcome! Crafting mats now show an AH price and a SELL ON AH / VENDOR / HOLD verdict. /mattip for commands."] }, -- one line on first install only
   debugLines = function()
     local n = 0
     for _ in pairs(db and db.prices or {}) do n = n + 1 end
