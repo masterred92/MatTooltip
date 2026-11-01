@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.4.1
+- A scan that hits an error no longer leaves MatTooltip re-processing every later AH update.
+- `/mattip margin` checks the value (0.5 to 10) and shows the current one.
+- `/mattip list` shows item names, not just IDs.
+
 ## 0.4.0
 - Every Trade Goods item now counts as a mat (cloth, herbs, ore, leather, and more).
 - Uses PriceLog's prices when installed, instead of keeping a second copy, and shows PriceLog's 7-day trend.

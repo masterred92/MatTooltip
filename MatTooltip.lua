@@ -126,8 +126,9 @@ local ahOpen, scanning, scanToken = false, false, 0
 local function ProcessScan()
   local n = C.AHNumReplicate()
   local best, i, now = {}, 0, C.Now()
+  local safeStep
   local function step()
-    if C.InCombat() then C_Timer.After(1, step) return end
+    if C.InCombat() then C_Timer.After(1, safeStep) return end
     local stop = math.min(i + 500, n)
     while i < stop do
       local itemID, _, count, buyout = C.AHReplicateRow(i)
@@ -139,7 +140,7 @@ local function ProcessScan()
       end
       i = i + 1
     end
-    if i < n then C_Timer.After(0, step) return end
+    if i < n then C_Timer.After(0, safeStep) return end
     local k = 0
     if priceLogKeepsPrices() then
       for _ in pairs(best) do k = k + 1 end
@@ -151,7 +152,9 @@ local function ProcessScan()
     scanning = false
     Core.Print("saved prices for " .. k .. " mats.")
   end
-  Core.SafeCall("scan", step)
+  -- An error mid-scan must not leave "scanning" stuck on (every later AH update would re-run the scan).
+  safeStep = function() if not Core.SafeCall("scan", step) then scanning = false end end
+  safeStep()
 end
 
 local f = CreateFrame("Frame")
@@ -202,6 +205,7 @@ Core.Setup({ cmd = "/mattip",
 SLASH_KENNYMATTOOLTIP1 = "/mattip"
 SLASH_KENNYMATTOOLTIP2 = "/kmt"
 SlashCmdList.KENNYMATTOOLTIP = function(msg)
+  if not db then return end
   local cmd, arg = (msg or ""):match("^(%S*)%s*(.-)$")
   cmd = cmd:lower()
   if cmd == "scan" then
@@ -219,14 +223,17 @@ SlashCmdList.KENNYMATTOOLTIP = function(msg)
     local want = (cmd == "never")
     if want == (SEED_NEVER[id] == true) then db.neverVendor[id] = nil else db.neverVendor[id] = want end
     Core.Print(id .. (want and " added to" or " removed from") .. " never-vendor list.")
-  elseif cmd == "margin" and tonumber(arg) then settings.sellMargin = tonumber(arg); Core.Print("margin " .. settings.sellMargin)
+  elseif cmd == "margin" then
+    local v = tonumber(arg)
+    if not v or v < 0.5 or v > 10 then Core.Print("usage: /mattip margin <0.5 to 10> (1.10 = AH must beat vendor by 10%). Now " .. settings.sellMargin) return end
+    settings.sellMargin = v; Core.Print("margin " .. v)
   elseif cmd == "toggle" then settings.enabled = not settings.enabled; Core.Print(settings.enabled and "on" or "off")
   elseif cmd == "bagnon" then
     settings.bagnon = not settings.bagnon
     Core.Print("Bagnon bag markers " .. (settings.bagnon and "on." or "off.") .. (M.RefreshBagnon and M.RefreshBagnon() and "" or " (Bagnon isn't loaded)"))
   elseif cmd == "list" then
-    for id in pairs(SEED_NEVER) do if M.IsNeverVendor(id) then Core.Print("never vendor: " .. id .. " (seed)") end end
-    for id, v in pairs(db.neverVendor) do if v and not SEED_NEVER[id] then Core.Print("never vendor: " .. id) end end
+    for id in pairs(SEED_NEVER) do if M.IsNeverVendor(id) then Core.Print("never vendor: " .. (C.GetItemName(id) or id) .. " (seed)") end end
+    for id, v in pairs(db.neverVendor) do if v and not SEED_NEVER[id] then Core.Print("never vendor: " .. (C.GetItemName(id) or id)) end end
   elseif cmd == "debug" then Core.PrintDebug()
   elseif cmd == "plugins" then for _, l in ipairs(providers.Describe()) do Core.Print(l) end
   elseif cmd == "report" then
