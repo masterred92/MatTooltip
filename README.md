@@ -37,7 +37,7 @@ Upgrading from 0.1.0: your settings and prices move to `KennyMatTooltipDB` autom
 2. Put the addon folder (`MatTooltip`) in `World of Warcraft\_forever_\Interface\AddOns\`. That folder sits next to `_retail_`; the exact name may differ.
 3. Restart the game, or type `/reload`. Check it is ticked in the AddOns list on the character screen.
 
-## In-game test checklist
+## In-game test checklist (launch day)
 1. MatTooltip appears in the AddOns list, not "out of date". `/mattip` prints help.
 2. Hover Light Leather / Peacebloom: HOLD "(scan the AH first)". Cloth or ore: no extra lines.
 3. Hover Pristine Leather / Frilled Lichen: red NEVER VENDOR flag.
@@ -51,6 +51,9 @@ Upgrading from 0.1.0: your settings and prices move to `KennyMatTooltipDB` autom
 11. In the AddOns list (character select or Esc > AddOns), MatTooltip shows its icon. If it shows a blank or green square, report it; the addon still works.
 12. With Bagnon: open your bags. Herbs and leather show SELL, VEND or ?, other items show nothing. `/mattip bagnon` hides and shows the tags. Cached (other character) bags don't error.
 13. With Titan Panel or ChocolateBar: the Mats display shows the bag value; hover lists each mat.
+
+## Licence
+MIT. Written from scratch; no code copied from other addons.
 
 ## Development
 `tests/run.sh [path-to-wow-ui-source-forever]` runs `luac -p`, luacheck, the mock-client tests and (with a path) the API check against Blizzard's UI source. GitHub Actions runs the same on every push. Releases are packaged by [BigWigsMods/packager](https://github.com/BigWigsMods/packager) only when a `v*` tag is pushed.
