@@ -223,8 +223,8 @@ SlashCmdList.KENNYMATTOOLTIP = function(msg)
   elseif cmd == "margin" then
     local v = tonumber(arg)
     if not v or v < 0.5 or v > 10 then Core.Print("usage: /mattip margin <0.5 to 10> (1.10 = AH must beat vendor by 10%). Now " .. settings.sellMargin) return end
-    settings.sellMargin = v; Core.Print("margin " .. v)
-  elseif cmd == "toggle" then settings.enabled = not settings.enabled; Core.Print(settings.enabled and "on" or "off")
+    settings.sellMargin = v; Core.Print(("margin set to %s: SELL ON AH when the AH price after the cut beats vendor by %d%% or more."):format(v, math.floor((v - 1) * 100 + 0.5)))
+  elseif cmd == "toggle" then settings.enabled = not settings.enabled; Core.Print("tooltip lines " .. (settings.enabled and "on." or "off."))
   elseif cmd == "bagnon" then
     settings.bagnon = not settings.bagnon
     Core.Print("Bagnon bag markers " .. (settings.bagnon and "on." or "off.") .. (M.RefreshBagnon and M.RefreshBagnon() and "" or " (Bagnon isn't loaded)"))

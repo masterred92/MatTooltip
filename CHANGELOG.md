@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.4.3
+- `/mattip toggle` says "tooltip lines on/off" instead of a bare "on"/"off".
+- `/mattip margin` explains the new setting (e.g. "beats vendor by 10% or more").
+- Description and Bagnon note updated: every Trade Goods item counts as a mat, not just leather and herbs.
+
 ## 0.4.2
 - Prices PriceLog takes from Auctionator are labelled 'AH (Auctionator)' instead of 'AH (your scan)'.
 - Prices of unknown age (e.g. from Auctionator) are no longer marked 'price is old'.

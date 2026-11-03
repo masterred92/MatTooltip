@@ -1,4 +1,4 @@
--- Bagnon bag markers: a small SELL / VEND / ? tag on Skinning and Herbalism mats in Bagnon's bags.
+-- Bagnon bag markers: a small SELL / VEND / ? tag on crafting mats (Trade Goods) in Bagnon's bags.
 -- Only if Bagnon (BagBrother 12.x) is loaded. It hooks BagBrother.Item:Update after the fact (hooksecurefunc),
 -- so Bagnon's own code runs unchanged. Turn it off with /mattip bagnon.
 local _, ns = ...
